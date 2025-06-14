@@ -30,12 +30,24 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  google_fonts: ^6.1.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.0.14
+  table_calendar: ^3.1.0 
+  fl_chart: ^0.68.0
+  uuid: ^4.0.0
+  provider: ^6.0.5
+
+
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.6
   flutter_test:
     sdk: flutter
 
@@ -45,6 +57,14 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+
+  # --- Tambahkan konfigurasi flutter_launcher_icons ini ---
+  flutter_launcher_icons: ^0.13.1 # Gunakan versi stabil terbaru
+
+flutter_launcher_icons:
+  android: "launcher_icon" # Nama ikon untuk Android
+  ios: true # Aktifkan pembuatan ikon untuk iOS
+  image_path: "assets/icons/app_icon.png" # Path ke file ikon Anda
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -57,6 +77,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - assets/images/
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -87,3 +109,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+

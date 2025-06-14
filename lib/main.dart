@@ -1,8 +1,27 @@
 import 'package:flutter/material.dart';
-import 'learning_task_card.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:belajarku/models/task_model.dart';
+import 'package:belajarku/splash_page.dart';
+import 'package:belajarku/theme_provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(TaskModelAdapter());
+  Hive.registerAdapter(TimeOfDayAdapter());
+
+  await Hive.openBox<TaskModel>('tasks');
+  await Hive.openBox<bool>(ThemeProvider.themeBoxName);
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -10,138 +29,61 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return MaterialApp(
-      title: 'Task List',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const TaskListScreen(),
-    );
-  }
-}
-
-class TaskListScreen extends StatefulWidget {
-  const TaskListScreen({super.key});
-
-  @override
-  State<TaskListScreen> createState() => _TaskListScreenState();
-}
-
-class _TaskListScreenState extends State<TaskListScreen> {
-  List<Map<String, String>> tasks = [
-    {
-      'title': 'Belajar Flutter',
-      'description': 'Pelajari widget dasar Flutter seperti Text, Row, Column.',
-    },
-    {
-      'title': 'Implementasi ListView',
-      'description': 'Gunakan ListView.builder untuk menampilkan data dinamis.',
-    },
-    {
-      'title': 'State Management',
-      'description': 'Pahami cara menggunakan setState dan Provider.',
-    },
-  ];
-
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descController = TextEditingController();
-
-  void _addTask() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Tambah Task Baru'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Judul'),
-            ),
-            TextField(
-              controller: _descController,
-              decoration: const InputDecoration(labelText: 'Deskripsi'),
-            ),
-          ],
+      title: 'Belajarku',
+      themeMode: themeProvider.themeMode,
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        brightness: Brightness.light,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.grey[50],
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.grey[700]),
+          titleTextStyle: GoogleFonts.poppins(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _titleController.clear();
-              _descController.clear();
-              Navigator.pop(context);
-            },
-            child: const Text('Batal'),
+        scaffoldBackgroundColor: Colors.grey[50],
+        cardColor: Colors.white,
+        textTheme: TextTheme(
+          bodyLarge: GoogleFonts.poppins(color: Colors.black87),
+          bodyMedium: GoogleFonts.poppins(color: Colors.grey[700]),
+          titleLarge: GoogleFonts.poppins(color: Colors.black87),
+          titleMedium: GoogleFonts.poppins(color: Colors.grey[800]),
+          titleSmall: GoogleFonts.poppins(color: Colors.grey[600]),
+          bodySmall: GoogleFonts.poppins(color: Colors.grey[500]),
+        ),
+      ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: Colors.grey[900],
+        cardColor: Colors.grey[800],
+        textTheme: TextTheme(
+          bodyLarge: GoogleFonts.poppins(color: Colors.white70),
+          bodyMedium: GoogleFonts.poppins(color: Colors.white70),
+          titleLarge: GoogleFonts.poppins(color: Colors.white),
+          titleMedium: GoogleFonts.poppins(color: Colors.white),
+          titleSmall: GoogleFonts.poppins(color: Colors.white60),
+          bodySmall: GoogleFonts.poppins(color: Colors.grey[400]),
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.grey[900],
+          elevation: 0,
+          iconTheme: IconThemeData(color: Colors.white70),
+          titleTextStyle: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
           ),
-          ElevatedButton(
-            onPressed: () {
-              final title = _titleController.text.trim();
-              final desc = _descController.text.trim();
-              if (title.isNotEmpty && desc.isNotEmpty) {
-                setState(() {
-                  tasks.add({'title': title, 'description': desc});
-                });
-                _titleController.clear();
-                _descController.clear();
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Tambah'),
-          ),
-        ],
+        ),
       ),
-    );
-  }
-
-  void _deleteTask(int index) {
-    setState(() {
-      tasks.removeAt(index);
-    });
-  }
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _descController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daftar Tugas Belajar'),
-        actions: [IconButton(icon: const Icon(Icons.add), onPressed: _addTask)],
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          final task = tasks[index];
-          return Stack(
-            children: [
-              LearningTaskCard(
-                title: task['title']!,
-                description: task['description']!,
-                onEdit: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Edit Task'),
-                      content: Text('Edit tugas: ${task['title']}'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Close'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                onDelete: () => _deleteTask(index),
-              ),
-            ],
-          );
-        },
-      ),
+      debugShowCheckedModeBanner: false,
+      home: const SplashPage(),
     );
   }
 }
