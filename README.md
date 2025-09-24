@@ -35,7 +35,7 @@
 
 ## Memulai Proyek
 
-Ikuti langkah-langkah berikut untuk menjalankan proyek secara lokal di mesin pengembangan Anda.
+Ikuti langkah-langkah berikut untuk menjalankan proyek secara lokal di perangkat Anda.
 
 ### Persiapan
 
@@ -59,3 +59,4 @@ flutter pub get
 flutter packages pub run build_runner build --delete-conflicting-outputs
 # Jika gagal, gunakan:
 dart run build_runner build --delete-conflicting-outputs
+#it work everytime hehehe
